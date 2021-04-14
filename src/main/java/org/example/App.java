@@ -3,37 +3,36 @@ package org.example;
 import javafx.application.Application;
 import javafx.collections.ObservableList;
 import javafx.geometry.Pos;
-import javafx.scene.Group;
-import javafx.scene.Node;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TextField;
+import javafx.scene.*;
+import javafx.scene.control.*;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
-import javafx.stage.FileChooser;
-import javafx.stage.Stage;
+import javafx.stage.*;
 
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-
+import java.io.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-
-public class App extends Application {
-    public static void main(String[] args) {
+public class App extends Application
+{
+    public static void main(String[] args)
+    {
         launch(args);
     }
 
     @Override
-    public void start(Stage primaryStage) {
+    public void start(Stage primaryStage)
+    {
         AtomicReference<File> fileOne = new AtomicReference<>();
         AtomicReference<File> fileSecond = new AtomicReference<>();
-        TextField firstFile = new InputField().setType(InputType.TEXT).setDisable().setCoordinates(50, 50).setPrefWidth(300).getField();
-        TextField secondFile = new InputField().setType(InputType.TEXT).setDisable().setCoordinates(375, 50).setPrefWidth(300).getField();
-        TextField outputFile = new InputField().setType(InputType.TEXT).setDisable().setCoordinates(200, 200).setPrefWidth(300).getField();
+        TextField firstFile =
+            new InputField().setType(InputType.TEXT).setDisable().setCoordinates(50, 50).setPrefWidth(300).getField();
+        TextField secondFile =
+            new InputField().setType(InputType.TEXT).setDisable().setCoordinates(375, 50).setPrefWidth(300).getField();
+        TextField outputFile =
+            new InputField().setType(InputType.TEXT).setDisable().setCoordinates(200, 200).setPrefWidth(300).getField();
+        CheckBox checkBox = new CustomCheckbox().createCheckbox()
+            .setText("Check this If you want Different records in both files(Invert Match)").setCoordinates(140, 170)
+            .getCheckbox();
 
         final ProgressIndicator pin = new ProgressIndicator();
         pin.setProgress(-1.0f);
@@ -44,8 +43,10 @@ public class App extends Application {
         progressIndicatorBox.setLayoutY(300);
 
         progressIndicatorBox.setVisible(false);
-        Button browseBtnFirstFile = new CustomButton().createButton().setCoordinates(150, 105).setText("Browse File 1").getButton();
-        Button browseBtnSecondFile = new CustomButton().createButton().setCoordinates(450, 105).setText("Browse File 2").getButton();
+        Button browseBtnFirstFile =
+            new CustomButton().createButton().setCoordinates(150, 105).setText("Browse File 1").getButton();
+        Button browseBtnSecondFile =
+            new CustomButton().createButton().setCoordinates(450, 105).setText("Browse File 2").getButton();
         Button match = new CustomButton().createButton().setCoordinates(300, 250).setText("Match Files").getButton();
 
         browseBtnFirstFile.setOnAction(event -> {
@@ -71,10 +72,12 @@ public class App extends Application {
         });
         match.setOnAction(event -> {
 
-            if ((firstFile.getText() != null && !firstFile.getText().isEmpty()) || (secondFile.getText() != null && !secondFile.getText().isEmpty())) {
+            if ((firstFile.getText() != null && !firstFile.getText().isEmpty()) || (secondFile.getText() != null
+                && !secondFile.getText().isEmpty())) {
                 progressIndicatorBox.setVisible(true);
                 new Thread(() -> {
-                    String matchedString = new MatchingUtil().read(firstFile.getText()).match(secondFile.getText());
+                    String matchedString =
+                        new MatchingUtil().read(firstFile.getText()).match(secondFile.getText(), checkBox.isSelected());
                     try (BufferedWriter bw = new BufferedWriter(new FileWriter(outputFile.getText()))) {
                         bw.append(matchedString);
                         bw.flush();
@@ -95,7 +98,8 @@ public class App extends Application {
 
         ObservableList<Node> list = root.getChildren();
 
-        list.addAll(browseBtnFirstFile, browseBtnSecondFile, firstFile, secondFile, progressIndicatorBox, match, outputFile);
+        list.addAll(browseBtnFirstFile, browseBtnSecondFile, firstFile, secondFile, progressIndicatorBox, match,
+                    outputFile, checkBox);
         outputFile.end();
         //Creating a Scene by passing the group object, height and width
         Scene scene = new Scene(root, 700, 400);
